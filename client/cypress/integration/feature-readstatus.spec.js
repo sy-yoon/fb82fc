@@ -1,13 +1,13 @@
 /// <reference types="cypress" />
 
 const alice = {
-    username: "Alice",
-    email: "alice@example.com",
+    username: "Alice1",
+    email: "alice1@example.com",
     password: "Z6#6%xfLTarZ9U",
   };
   const bob = {
-    username: "Bob",
-    email: "bob@example.com",
+    username: "Bob1",
+    email: "bob1@example.com",
     password: "L%e$xZHC4QKP@F",
   };
   
@@ -22,8 +22,8 @@ const alice = {
     it("sends message in a new conversation and Check read status ", () => {
       cy.login(alice.username, alice.password);
 
-      cy.get("input[name=search]").type("Bob");
-      cy.contains("Bob").click();
+      cy.get("input[name=search]").type("Bob1");
+      cy.contains("Bob1").click();
   
       cy.get("input[name=text]").type("First message{enter}");
       cy.get("input[name=text]").type("Second message{enter}");

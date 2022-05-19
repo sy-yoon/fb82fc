@@ -72,7 +72,7 @@ router.get("/", async (req, res, next) => {
       conversations[i] = convoJSON;
     }
 
-    res.json(conversations);
+    res.json(conversations.reverse());
   } catch (error) {
     next(error);
   }

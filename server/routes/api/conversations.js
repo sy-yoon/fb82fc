@@ -18,7 +18,7 @@ router.get("/", async (req, res, next) => {
           user2Id: userId,
         },
       },
-      attributes: ["id"],
+      attributes: ["id", "user1ReadMessageId", "user2ReadMessageId"],
       order: [[Message, "createdAt", "ASC"]],
       include: [
         { model: Message, order: ["createdAt", "DESC"] },
@@ -54,9 +54,14 @@ router.get("/", async (req, res, next) => {
       // set a property "otherUser" so that frontend will have easier access
       if (convoJSON.user1) {
         convoJSON.otherUser = convoJSON.user1;
+        convoJSON.readMessageId = convoJSON.user2ReadMessageId;
+        delete convoJSON.user2ReadMessageId;
         delete convoJSON.user1;
+
       } else if (convoJSON.user2) {
         convoJSON.otherUser = convoJSON.user2;
+        convoJSON.readMessageId = convoJSON.user1ReadMessageId;
+        delete convoJSON.user1ReadMessageId;
         delete convoJSON.user2;
       }
 
@@ -73,6 +78,21 @@ router.get("/", async (req, res, next) => {
     }
 
     res.json(conversations);
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.patch("/:id/readMessage", async (req, res, next) => {
+  try {
+    if (!req.user) {
+      return res.sendStatus(401);
+    }
+    const readMessage = req.body;
+    const convo = await Conversation.findConversationById(req.params.id);
+    let updateSet = (req.user.id === convo.user1Id)? { user1ReadMessageId: readMessage.id } : { user2ReadMessageId: readMessage.id};
+    convo.update(updateSet);
+    res.status(200).send({id : req.params.id});
   } catch (error) {
     next(error);
   }

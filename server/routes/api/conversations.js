@@ -93,6 +93,7 @@ router.patch("/:id/readMessage", async (req, res, next) => {
     let updateSet = (req.user.id === convo.user1Id)? { user1ReadMessageId: readMessage.id } : { user2ReadMessageId: readMessage.id};
     convo.update(updateSet);
     res.status(200).send({id : req.params.id});
+
   } catch (error) {
     next(error);
   }

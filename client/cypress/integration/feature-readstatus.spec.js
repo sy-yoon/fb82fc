@@ -33,7 +33,7 @@ const alice = {
       cy.reload();
       cy.login(bob.username, bob.password);
 
-      cy.contains('3').should('have.class', 'MuiChip-label')
+      cy.contains('3').should('have.class', 'MuiBadge-badge')
     });
   });
   

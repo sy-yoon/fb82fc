@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, Chip, Typography } from '@material-ui/core';
+import { Box, Badge, Typography } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 
 const useStyles = makeStyles((theme) => ({
@@ -16,19 +16,28 @@ const useStyles = makeStyles((theme) => ({
   },
   previewText: {
     fontSize: 12,
+    fontWeight: 400,
     color: '#9CADC8',
     letterSpacing: -0.17,
   },
-  unread: {
-    fontSize: '10px',
-    background: '#3F92FF',
-    borderRadius: '10px',
-    height: '20px',
-    color: '#ffffff',
-    marginRight: '30px',
-    
+  previewBoldText: {
+    fontSize: 14,
+    fontWeight: 600,
+    letterSpacing: -0.17,
   },
+  unread:{
+    '& .MuiBadge-badge': {
+      fontSize: '10px',
+      background: '#3F92FF',
+      color: '#ffffff',
+      right: 0,
+      marginRight: '30px',    
+      top: 0,
+      padding: '0',
+    },
+  }
 }));
+
 
 const ChatContent = ({ conversation }) => {
   const classes = useStyles();
@@ -44,21 +53,11 @@ const ChatContent = ({ conversation }) => {
         <Typography className={classes.username}>
           {otherUser.username}
         </Typography>
-        <Typography className={classes.previewText}>
+        <Typography className={(unReadMessage>0) ? classes.previewBoldText : classes.previewText} >
           {latestMessageText}
         </Typography>
       </Box>
-    {
-      (()=>{
-        if(unReadMessage){
-          return(
-            <Chip label={unReadMessage} size="small" className={classes.unread} />
-          )
-        }
-        
-      })()
-    }    
-     
+      { (unReadMessage>0) && <Badge badgeContent={unReadMessage} color="secondary" className={classes.unread}/> }
     </Box>
   );
 };

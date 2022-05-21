@@ -54,14 +54,18 @@ router.get("/", async (req, res, next) => {
       // set a property "otherUser" so that frontend will have easier access
       if (convoJSON.user1) {
         convoJSON.otherUser = convoJSON.user1;
+        convoJSON.otherUser.readMessageId =convoJSON.user1ReadMessageId; 
         convoJSON.readMessageId = convoJSON.user2ReadMessageId;
+        delete convoJSON.user1ReadMessageId;
         delete convoJSON.user2ReadMessageId;
         delete convoJSON.user1;
 
       } else if (convoJSON.user2) {
         convoJSON.otherUser = convoJSON.user2;
+        convoJSON.otherUser.readMessageId =convoJSON.user2ReadMessageId; 
         convoJSON.readMessageId = convoJSON.user1ReadMessageId;
         delete convoJSON.user1ReadMessageId;
+        delete convoJSON.user2ReadMessageId;
         delete convoJSON.user2;
       }
 
@@ -83,16 +87,38 @@ router.get("/", async (req, res, next) => {
   }
 });
 
-router.patch("/:id/readMessage", async (req, res, next) => {
+router.patch("/:id/read-status", async (req, res, next) => {
   try {
     if (!req.user) {
       return res.sendStatus(401);
     }
     const readMessage = req.body;
     const convo = await Conversation.findConversationById(req.params.id);
+    if(![convo.user1Id, convo.user2Id].includes(req.user.id)){
+      return res.sendStatus(401);
+    }
     let updateSet = (req.user.id === convo.user1Id)? { user1ReadMessageId: readMessage.id } : { user2ReadMessageId: readMessage.id};
     convo.update(updateSet);
     res.status(200).send({id : req.params.id});
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.get("/:id/read-status", async (req, res, next) => {
+  try {
+    if (!req.user) {
+      return res.sendStatus(401);
+    }
+    const readMessage = req.body;
+    const convo = await Conversation.findConversationById(req.params.id);
+    if(![convo.user1Id, convo.user2Id].includes(req.user.id)){
+      return res.sendStatus(401);
+    }
+    const result = {};
+    result[convo.user1Id] = convo.user1ReadMessageId;
+    result[convo.user2Id] = convo.user2ReadMessageId;
+    res.status(200).send(result);
   } catch (error) {
     next(error);
   }

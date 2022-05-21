@@ -62,6 +62,14 @@ const Home = ({ user, logout }) => {
     });
   };
 
+  const sendReadStatus = (data, body) => {
+    socket.emit('read-status', {
+      message: data.message,
+      recipientId: body.recipientId,
+      sender: data.sender,
+    });
+  };
+
   const postMessage = async (body) => {
     try {
       const data = await saveMessage(body);
@@ -115,7 +123,7 @@ const Home = ({ user, logout }) => {
               convoCopy.latestMessageText = message.text;
               if (convoCopy.otherUser.username === activeConversation) {
                 convoCopy.readMessageId = message.id;
-                updateReadMessage(message);
+                updateReadStatus(message, convoCopy);
               }
               return convoCopy;
             } else {
@@ -128,15 +136,38 @@ const Home = ({ user, logout }) => {
     [activeConversation]
   );
 
-  const updateReadMessage = async (message) => {
+  const receivedReadStatus = useCallback(
+    (data) => {
+      const { message, sender = null } = data;
+      setConversations((prev) =>
+          prev.map((convo) => {
+            if (convo.id === message.conversationId) {
+              const convoCopy = { ...convo };
+              convoCopy.messages = [...convo.messages];
+              if (convoCopy.otherUser.username === activeConversation) {
+                convoCopy.otherUser.readMessageId = message.id;
+              }
+              return convoCopy;
+            } else {
+              return convo;
+            }
+          })
+        );
+    },
+    [activeConversation]
+  );
+
+  const updateReadStatus = async (message, convo) => {
     const { data } = await axios.patch(
-      `/api/conversations/${message.conversationId}/readMessage`,
+      `/api/conversations/${message.conversationId}/read-status`,
       { id: message.id }
     );
+    
+    sendReadStatus({message:message, sender:user}, {recipientId: convo.otherUser.id});
     return data;
   };
 
-  const setActiveChat = (conversation) => {
+  const setActiveChat = async (conversation) => {
     setActiveConversation(conversation.otherUser.username);
     readMessageAll(conversation);
   };
@@ -151,7 +182,7 @@ const Home = ({ user, logout }) => {
             const lastMessage =
               convoCopy.messages[convoCopy.messages.length - 1];
             convoCopy.readMessageId = lastMessage.id;
-            updateReadMessage(lastMessage);
+            updateReadStatus(lastMessage, convoCopy);
             return convoCopy;
           } else {
             return convo;
@@ -196,6 +227,7 @@ const Home = ({ user, logout }) => {
     socket.on('add-online-user', addOnlineUser);
     socket.on('remove-offline-user', removeOfflineUser);
     socket.on('new-message', addMessageToConversation);
+    socket.on('read-status', receivedReadStatus);
 
     return () => {
       // before the component is destroyed
@@ -203,8 +235,9 @@ const Home = ({ user, logout }) => {
       socket.off('add-online-user', addOnlineUser);
       socket.off('remove-offline-user', removeOfflineUser);
       socket.off('new-message', addMessageToConversation);
+      socket.off('read-status', receivedReadStatus);
     };
-  }, [addMessageToConversation, addOnlineUser, removeOfflineUser, socket]);
+  }, [addMessageToConversation, addOnlineUser, removeOfflineUser, receivedReadStatus, socket]);
 
   useEffect(() => {
     // when fetching, prevent redirect

@@ -54,7 +54,7 @@ router.get("/", async (req, res, next) => {
       // set a property "otherUser" so that frontend will have easier access
       if (convoJSON.user1) {
         convoJSON.otherUser = convoJSON.user1;
-        convoJSON.otherUser.readMessageId =convoJSON.user1ReadMessageId; 
+        convoJSON.otherUser.readMessageId = convoJSON.user1ReadMessageId; 
         convoJSON.readMessageId = convoJSON.user2ReadMessageId;
         delete convoJSON.user1ReadMessageId;
         delete convoJSON.user2ReadMessageId;
@@ -62,7 +62,7 @@ router.get("/", async (req, res, next) => {
 
       } else if (convoJSON.user2) {
         convoJSON.otherUser = convoJSON.user2;
-        convoJSON.otherUser.readMessageId =convoJSON.user2ReadMessageId; 
+        convoJSON.otherUser.readMessageId = convoJSON.user2ReadMessageId; 
         convoJSON.readMessageId = convoJSON.user1ReadMessageId;
         delete convoJSON.user1ReadMessageId;
         delete convoJSON.user2ReadMessageId;

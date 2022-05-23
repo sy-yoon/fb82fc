@@ -16,8 +16,6 @@ const Messages = (props) => {
     return 0;    
   }, [messages, otherUser, userId]);
 
-  //const a = lastReadMessageId();
-  //console.log(a);
   return (
     <Box>
       {messages.map((message) => {

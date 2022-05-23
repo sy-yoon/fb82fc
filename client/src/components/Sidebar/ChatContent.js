@@ -44,9 +44,7 @@ const ChatContent = ({ conversation }) => {
 
   const { otherUser } = conversation;
   const latestMessageText = conversation.id && conversation.latestMessageText;
-  const unReadMessage = conversation.messages.filter(
-    (message) => message.id > conversation.readMessageId
-  ).length;
+  const unReadMessage = conversaion.messages[conversaion.messages.length-1].id - conversation.readMessageId;
   return (
     <Box className={classes.root}>
       <Box>

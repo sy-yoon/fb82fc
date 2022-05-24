@@ -3,15 +3,32 @@ const User = require("./user");
 const Message = require("./message");
 
 // associations
+const ConversationUsers = sequelize.define('ConversationUsers', {
+  conversationId: {
+    type: DataTypes.INTEGER,
+    references: {
+      model: Conversation,
+      key: 'id'
+    }
+  },
+  userId: {
+    type: DataTypes.INTEGER,
+    references: {
+      model: User,
+      key: 'id'
+    }
+  }
+});
+Conversation.belongsToMany(User, { through: ConversationUsers });
+User.belongsToMany(Conversation, { through: ConversationUsers });
 
-User.hasMany(Conversation);
-Conversation.belongsTo(User, { as: "user1" });
-Conversation.belongsTo(User, { as: "user2" });
-Message.belongsTo(Conversation);
-Conversation.hasMany(Message);
+Message.belongsTo(ConversationUsers);
+ConversationUsers.hasMany(Message);
 
 module.exports = {
   User,
   Conversation,
-  Message
+  Message,
+  ConversationUsers
 };
+

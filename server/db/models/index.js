@@ -7,14 +7,14 @@ const ConversationUsers = sequelize.define('ConversationUsers', {
   conversationId: {
     type: DataTypes.INTEGER,
     references: {
-      model: Conversation, // 'Movies' would also work
+      model: Conversation,
       key: 'id'
     }
   },
   userId: {
     type: DataTypes.INTEGER,
     references: {
-      model: User, // 'Actors' would also work
+      model: User,
       key: 'id'
     }
   }
